@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "grunt": "~0.4.1"
+    "grunt": "github:danrossi/grunt#minimatch-fix"
   }
 }

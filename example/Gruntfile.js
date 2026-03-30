@@ -1,7 +1,12 @@
 
+var path = require("path");
+
+
 module.exports = function(grunt) {
 
-  grunt.loadNpmTasks("grunt-aws");
+  //grunt.loadNpmTasks("grunt-aws");
+
+  grunt.loadTasks(path.join("../","tasks", "services"));
 
   grunt.initConfig({
 
@@ -11,7 +16,13 @@ module.exports = function(grunt) {
       options: {
         accessKeyId: "<%= aws.accessKeyId %>",
         secretAccessKey: "<%= aws.secretAccessKey %>",
-        bucket: "..."
+        bucket: "<%= aws.bucket %>",
+        "access": "private",
+        "gzip": true,
+        "cache": true,
+        "headers": {
+          "StorageClass": "REDUCED_REDUNDANCY"
+        }
       },
       build: {
         cwd: "build",

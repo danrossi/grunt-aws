@@ -22,7 +22,7 @@
   "licenses": "MIT",
   "main": "tasks/aws.js",
   "peerDependencies": {
-    "grunt": "^0.3.17"
+    "grunt": "github:danrossi/grunt#minimatch-fix"
   },
   "keywords": [
     "gruntplugin",
@@ -37,13 +37,13 @@
     "compress"
   ],
   "dependencies": {
+    "@aws-sdk/client-cloudfront": "^3.1019.0",
+    "@aws-sdk/client-route-53": "^3.1019.0",
+    "@aws-sdk/client-s3": "^3.1019.0",
+    "@aws-sdk/client-sns": "^3.1019.0",
+    "@aws-sdk/s3-request-presigner": "^3.1019.0",
     "async": "~3.2.6",
     "lodash": "^4.17.23",
     "mime": "^4.1.0"
-  },
-  "devDependencies": {
-    "@aws-sdk/client-cloudfront": "^3.1019.0",
-    "@aws-sdk/client-s3": "^3.1019.0",
-    "@aws-sdk/s3-request-presigner": "^3.1019.0"
   }
 }
