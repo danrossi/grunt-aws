@@ -8,26 +8,55 @@ module.exports = function(grunt) {
         var done = this.async();
 
         var DEFAULTS = {
-            expiry: 2592000
+            expiry: 86400
         };
 
         var opts = this.options(DEFAULTS);
+
+
 
         var s3 = new S3({
             credentials: {
                 accessKeyId: opts.accessKeyId,
                 secretAccessKey: opts.secretAccessKey
-            }
+            },
+            region: opts.region
         });
 
-       const url = await getSignedUrl(s3, new GetObjectCommand({
-            Bucket: opts.bucket,
-            Key: opts.key
-        }), {
-            expiresIn: opts.expiry
-        });
 
-            console.log("The URL is", url);
+       let keys = this.data.keys || [ { key: this.data.key }];
+
+
+
+        await Promise.all(keys.map(async function(file) {
+            return new Promise(async function(resolve, reject) {
+        
+
+                console.log("Upload file ", file.key);
+        
+        
+                const url = await getSignedUrl(s3, new GetObjectCommand({
+                    Bucket: opts.bucket,
+                    Key: file.key
+                }), {
+                    expiresIn: opts.expiry
+                });
+
+                console.log("The URL is", url);
+
+                resolve();
+                
+
+            
+
+        
+                
+            });
+            
+
+
+        }));
+
 
         done();
 

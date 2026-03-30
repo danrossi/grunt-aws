@@ -27,7 +27,22 @@ module.exports = function(grunt) {
       },
       build: {
         cwd: "build",
-        src: "**"
+        src: "/foo.js"
+      }
+    },
+     s3signedurl: {
+      options: {
+        accessKeyId: "<%= aws.accessKeyId %>",
+        secretAccessKey: "<%= aws.secretAccessKey %>",
+        bucket: "<%= aws.bucket %>",
+        region: "<%= aws.region %>",
+        expiry: 86400
+      },
+      test: {
+        //key: "/foo.js",
+        keys: [
+          { key: "foo.js" }
+        ]
       }
     },
 
