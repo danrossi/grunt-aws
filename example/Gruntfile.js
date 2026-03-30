@@ -35,9 +35,9 @@ module.exports = function(grunt) {
       options: {
         accessKeyId: "<%= aws.accessKeyId %>",
         secretAccessKey: "<%= aws.secretAccessKey %>",
-        distributionId: "...",
+        distributionId: "<%= aws.cloudfront_dist_id %>",
         invalidations: [
-          "/index.html"
+          "/*"
         ]
       },
       invalidate: {}
