@@ -1,6 +1,7 @@
-var AWS = require("aws-sdk"),
-    _ = require("lodash"),
+var _ = require("lodash"),
     async = require("async");
+
+const { SNS } = require("@aws-sdk/client-sns");
 
 module.exports = function(grunt) {
 
@@ -29,14 +30,19 @@ module.exports = function(grunt) {
     var done = this.async();
 
     //whitelist allowed keys
-    AWS.config.update(_.pick(opts,
+    /*AWS.config.update(_.pick(opts,
       'accessKeyId',
       'secretAccessKey',
       'region'
-    ), true);
+    ), true);*/
 
     //sns client
-    var sns = new AWS.SNS();
+    var sns = new SNS({
+      credentials: {
+        accessKeyId: opts.accessKeyId,
+        secretAccessKey: opts.secretAccessKey
+      }
+    });
 
     //create records defined in opts.invalidations
     publishTopic(done);

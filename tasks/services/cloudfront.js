@@ -1,6 +1,7 @@
-var AWS = require("aws-sdk"),
-  _ = require("lodash"),
+var _ = require("lodash"),
   async = require("async");
+
+const { CloudFront } = require("@aws-sdk/client-cloudfront");
 
 module.exports = function(grunt) {
   //cloudfront description
@@ -21,16 +22,21 @@ module.exports = function(grunt) {
     var done = this.async();
 
     //whitelist allowed keys
-    AWS.config.update(_.pick(opts, "accessKeyId", "secretAccessKey"), true);
+    //AWS.config.update(_.pick(opts, "accessKeyId", "secretAccessKey"), true);
 
     //whitelist allowed keys
-    AWS.config.update(
+    /*AWS.config.update(
       _.pick(opts, "accessKeyId", "secretAccessKey", "sessionToken"),
       true
-    );
+    );*/
 
     //cloudfront client
-    var cloudfront = new AWS.CloudFront();
+    var cloudfront = new CloudFront({
+      credentials: {
+        accessKeyId: opts.accessKeyId,
+        secretAccessKey: opts.secretAccessKey
+      }
+    });
 
     var subtasks = [];
     subtasks.push(createInvalidations);

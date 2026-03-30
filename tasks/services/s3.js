@@ -1,5 +1,4 @@
-var AWS = require("aws-sdk"),
-    path = require("path"),
+const path = require("path"),
     async = require("async"),
     _ = require("lodash"),
     fs = require("fs"),
@@ -7,6 +6,8 @@ var AWS = require("aws-sdk"),
     zlib = require("zlib"),
     CacheMgr = require("../cache-mgr"),
     mime = require("mime");
+
+const { S3 } = require('@aws-sdk/client-s3');
 
 module.exports = function(grunt) {
 
@@ -68,7 +69,7 @@ module.exports = function(grunt) {
       mime.default_type = opts.mimeDefault;
 
     //whitelist allowed keys
-    AWS.config.update(_.pick(opts,
+    /*AWS.config.update(_.pick(opts,
       'sessionToken',
       'region',
       'sslEnabled',
@@ -81,10 +82,15 @@ module.exports = function(grunt) {
         'accessKeyId',
         'secretAccessKey'
       ));
-    }
+    }*/
 
     //s3 client
-    var S3 = new AWS.S3({signatureVersion: opts.signatureVersion});
+    var S3 = new S3({
+      credentials: {
+        accessKeyId: opts.accessKeyId,
+        secretAccessKey: opts.secretAccessKey
+      }
+    });
 
     //dry run prefix
     var DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
@@ -192,7 +198,7 @@ module.exports = function(grunt) {
       if (opts.region && opts.region !== 'us-east-1')
           params.CreateBucketConfiguration = { LocationConstraint: opts.region };
       //check the bucket doesn't exist first
-      S3.listBuckets(function(err, data){
+      S3.listBuckets({}, function(err, data){
         if(err) {
           err.message = 'createBucket:S3.listBuckets: ' + err.message;
           return callback(err);

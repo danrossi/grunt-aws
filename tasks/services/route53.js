@@ -1,7 +1,8 @@
-var AWS = require("aws-sdk"),
-    _ = require("lodash"),
+var _ = require("lodash"),
     async = require("async"),
     CacheMgr = require("../cache-mgr");
+
+const { Route53 } = require('@aws-sdk/client-route-53');
 
 module.exports = function(grunt) {
  
@@ -38,13 +39,18 @@ module.exports = function(grunt) {
     var DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
 
     //whitelist allowed keys
-    AWS.config.update(_.pick(opts,
+    /*AWS.config.update(_.pick(opts,
       'accessKeyId',
       'secretAccessKey'
-    ), true);
+    ), true);*/
  
     //route53 client
-    var Route53 = new AWS.Route53();
+    var Route53 = new Route53({
+      credentials: {
+        accessKeyId: opts.accessKeyId,
+        secretAccessKey: opts.secretAccessKey
+      }
+    });
 
     //create records defined in opts.zones
     createRecordsForZones(done);
@@ -81,7 +87,7 @@ module.exports = function(grunt) {
         if (cache.id) return callback(null, cache.id);
       }
       //get list of zones from route53 and load into cache if cache enabled
-      Route53.listHostedZones(function(err, data){
+      Route53.listHostedZones({}, function(err, data){
         if(err) return callback(err);
         var zoneDataForCurrentZone;
         _.each(data.HostedZones, function(zoneData){
