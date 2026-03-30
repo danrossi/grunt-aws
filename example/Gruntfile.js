@@ -23,8 +23,7 @@ module.exports = function(grunt) {
         "cache": true,
         "headers": {
           "StorageClass": "REDUCED_REDUNDANCY"
-        },
-        cache: false
+        }
       },
       build: {
         cwd: "build",
