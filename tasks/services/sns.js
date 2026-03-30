@@ -41,7 +41,8 @@ module.exports = function(grunt) {
       credentials: {
         accessKeyId: opts.accessKeyId,
         secretAccessKey: opts.secretAccessKey
-      }
+      },
+      region: opts.region
     });
 
     //create records defined in opts.invalidations
