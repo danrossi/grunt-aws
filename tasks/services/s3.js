@@ -4,12 +4,21 @@ const path = require("path"),
     fs = require("fs"),
     crypto = require("crypto"),
     zlib = require("zlib"),
-    CacheMgr = require("../cache-mgr"),
-    mime = require("mime").default;
+    CacheMgr = require("../cache-mgr");
+    //mime = require("mime").default;
+let mime;
+
+const loadModule = async () => {
+  mime = await import('mime');
+  // Use someModule here
+};
+loadModule();
 
 const { S3 } = require('@aws-sdk/client-s3');
 
-module.exports = function(grunt) {
+module.exports = async function(grunt) {
+
+  
 
   //s3 description
   let DESC = "grunt-aws's s3 task for easy deploys";
@@ -31,12 +40,14 @@ module.exports = function(grunt) {
     assumeRole: false
   };
 
+  
+
   //Action taking place.
   let action = "Put";
 
   //s3 task
-  grunt.registerMultiTask("s3", DESC, function() {
-
+  grunt.registerMultiTask("s3", DESC, async function() {
+   
     //normalize files array (force expand)
     let files = [];
     this.files.forEach(function(file) {
@@ -55,6 +66,11 @@ module.exports = function(grunt) {
 
     //mark as async
     let done = this.async();
+
+    //dynamic import due to grunt being old and not supporting ES.
+    const mimeModule = await import('mime');
+    const mime = mimeModule.default;
+    
     //get options
     let opts = this.options(DEFAULTS);
 
@@ -63,10 +79,10 @@ module.exports = function(grunt) {
       grunt.fail.warn("No 'bucket' has been specified");
 
     //custom mime types
-    if(typeof opts.mime === 'object')
-      mime.define(opts.mime);
-    if(typeof opts.mimeDefault === 'string')
-      mime.default_type = opts.mimeDefault;
+    //if(typeof opts.mime === 'object')
+    //  mime.define(opts.mime);
+    //if(typeof opts.mimeDefault === 'string')
+    //  mime.default_type = opts.mimeDefault;
 
     //whitelist allowed keys
     /*AWS.config.update(_.pick(opts,
