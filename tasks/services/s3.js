@@ -6,13 +6,7 @@ const path = require("path"),
     zlib = require("zlib"),
     CacheMgr = require("../cache-mgr");
     //mime = require("mime").default;
-let mime;
 
-const loadModule = async () => {
-  mime = await import('mime');
-  // Use someModule here
-};
-loadModule();
 
 const { S3 } = require('@aws-sdk/client-s3');
 
