@@ -315,18 +315,24 @@ module.exports = async function(grunt) {
             err.message = 'getFileList:fetchObjects:s3.listObjects: ' + err.message;
             return callback(err);
           }
+         
+          if (objs.Contents) {
+             //store results
+            objs.Contents.forEach(function(obj) {
+              cache.files[obj.Key] = JSON.parse(obj.ETag);
+            });
+            cache.prefixes[prefix] = Date.now();
+            stats.refreshed = true;
 
-          //store results
-          objs.Contents.forEach(function(obj) {
-            cache.files[obj.Key] = JSON.parse(obj.ETag);
-          });
-          cache.prefixes[prefix] = Date.now();
-          stats.refreshed = true;
-
-          if(objs.IsTruncated)
-            fetchObjects(objs.Contents.pop().Key);
-          else
+            if(objs.IsTruncated)
+              fetchObjects(objs.Contents.pop().Key);
+            else
+              callback();
+          } else {
+            //no objects with the specified prefix. Could be a specific dest filename when only one file is globbed
             callback();
+          }
+         
         });
       }
     }

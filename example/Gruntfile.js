@@ -28,6 +28,13 @@ module.exports = function(grunt) {
       build: {
         cwd: "build",
         src: "**"
+      },
+      build2: {
+        options: {
+          "cache": false,
+        },
+        cwd: "build2",
+        src: "**"
       }
     },
      s3signedurl: {
