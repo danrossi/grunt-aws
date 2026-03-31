@@ -33,20 +33,20 @@ module.exports = function(grunt) {
         await Promise.all(keys.map(async function(file) {
             return new Promise(async function(resolve, reject) {
         
+                try {
+                    const url = await getSignedUrl(s3, new GetObjectCommand({
+                        Bucket: opts.bucket,
+                        Key: file.key
+                    }), {
+                        expiresIn: opts.expiry
+                    });
 
-                console.log("Upload file ", file.key);
-        
-        
-                const url = await getSignedUrl(s3, new GetObjectCommand({
-                    Bucket: opts.bucket,
-                    Key: file.key
-                }), {
-                    expiresIn: opts.expiry
-                });
+                    console.log("The URL is", url);
 
-                console.log("The URL is", url);
-
-                resolve();
+                    resolve();
+                } catch (e) {
+                    reject();
+                }
                 
 
             
