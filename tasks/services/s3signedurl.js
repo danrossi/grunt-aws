@@ -8,7 +8,9 @@ module.exports = function(grunt) {
         var done = this.async();
 
         var DEFAULTS = {
-            expiry: 86400
+            expiry: 86400,
+             //dynamically generated name from a callback function
+            keyName: null
         };
 
         var opts = this.options(DEFAULTS);
@@ -24,7 +26,7 @@ module.exports = function(grunt) {
         });
 
 
-       let keys = this.data.keys || [ { key: this.data.key }];
+       let keys = this.data.keys || [ { key: opts.keyName ? opts.keyName() : this.data.key }];
 
 
 
