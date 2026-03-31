@@ -21,8 +21,15 @@
   },
   "licenses": "MIT",
   "main": "tasks/aws.js",
+  "overrides": {
+    "grunt": {
+      "minimatch": "^3.1.5",
+      "glob": "^13.0.6",
+      "nopt": "^9.0.0"
+    }
+  },
   "peerDependencies": {
-    "grunt": "github:danrossi/grunt#minimatch-fix"
+    "grunt": "^1.6.1"
   },
   "keywords": [
     "gruntplugin",
