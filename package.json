@@ -23,7 +23,7 @@
   "main": "tasks/aws.js",
   "overrides": {
     "grunt": {
-      "minimatch": "~3.1.5",
+      "minimatch": "~10.2.5",
       "glob": "~13.0.6",
       "nopt": "~9.0.0"
     }
@@ -50,7 +50,7 @@
     "@aws-sdk/client-sns": "~3.1021.0",
     "@aws-sdk/s3-request-presigner": "~3.1021.0",
     "async": "~3.2.6",
-    "lodash": "^4.17.23",
+    "lodash": "~4.17.23",
     "mime": "~4.1.0"
   }
 }
