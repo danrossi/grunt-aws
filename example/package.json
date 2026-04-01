@@ -1,12 +1,12 @@
 {
   "overrides": {
     "grunt": {
-      "minimatch": "^3.1.5",
-      "glob": "^13.0.6",
-      "nopt": "^9.0.0"
+      "minimatch": "~3.1.5",
+      "glob": "~13.0.6",
+      "nopt": "~9.0.0"
     }
   },
   "dependencies": {
-    "grunt": "^1.6.1"
+    "grunt": "~1.6.1"
   }
 }
