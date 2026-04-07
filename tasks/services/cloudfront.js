@@ -25,7 +25,8 @@ module.exports = function(grunt) {
     var cloudfront = new CloudFront({
       credentials: {
         accessKeyId: opts.accessKeyId,
-        secretAccessKey: opts.secretAccessKey
+        secretAccessKey: opts.secretAccessKey,
+        sessionToken: opts.sessionToken
       }
     });
 

@@ -33,7 +33,8 @@ module.exports = function(grunt) {
     var sns = new SNS({
       credentials: {
         accessKeyId: opts.accessKeyId,
-        secretAccessKey: opts.secretAccessKey
+        secretAccessKey: opts.secretAccessKey,
+        sessionToken: opts.sessionToken
       },
       region: opts.region
     });

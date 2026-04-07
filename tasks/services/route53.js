@@ -42,7 +42,8 @@ module.exports = function(grunt) {
     var route53 = new Route53({
       credentials: {
         accessKeyId: opts.accessKeyId,
-        secretAccessKey: opts.secretAccessKey
+        secretAccessKey: opts.secretAccessKey,
+        sessionToken: opts.sessionToken
       }
     });
 

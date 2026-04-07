@@ -6,7 +6,9 @@ const path = require("path"),
     zlib = require("zlib"),
     CacheMgr = require("../cache-mgr");
 
-const { S3 } = require('@aws-sdk/client-s3');
+const { S3 } = require('@aws-sdk/client-s3'),
+{ NodeHttpHandler } = require("@aws-sdk/node-http-handler"),
+https = require("https");
 
 module.exports = function(grunt) {
 
@@ -26,8 +28,9 @@ module.exports = function(grunt) {
     overwrite: true,
     createBucket: false,
     enableWeb: false,
-    signatureVersion: 'v4',
-    assumeRole: false
+    assumeRole: false,
+    maxRetries: 3,
+    httpOptions: null
   };
 
   //Action taking place.
@@ -66,13 +69,26 @@ module.exports = function(grunt) {
     if(!opts.bucket)
       grunt.fail.warn("No 'bucket' has been specified");
 
+    var requestHandler;
+
+    if (opts.httpOptions) {
+      requestHandler = new NodeHttpHandler({
+        connectionTimeout: 2000,
+        requestTimeout: 5000,
+        httpsAgent: new https.Agent(opts.httpOptions)
+      });
+    }
+
     //s3 client
     var s3 = new S3({
       credentials: {
         accessKeyId: opts.accessKeyId,
-        secretAccessKey: opts.secretAccessKey
+        secretAccessKey: opts.secretAccessKey,
+        sessionToken: opts.sessionToken
       },
       region: opts.region,
+      maxAttempts: opts.maxRetries,
+      requestHandler: requestHandler
     });
 
     //dry run prefix
@@ -219,7 +235,7 @@ module.exports = function(grunt) {
 
       s3.getBucketWebsite({ Bucket:opts.bucket }, function(err){
         if ((err && err.name === 'NoSuchWebsiteConfiguration') || webOptions["grunt-overwrite"]){
-          devare webOptions["grunt-overwrite"];
+          delete webOptions["grunt-overwrite"];
           //opts.enableWeb can be the params for WebsiteRedirectLocation.
           //Otherwise, just set the index.html as default suffix
           grunt.log.writeln('Enabling website configuration on ' + opts.bucket + '...');

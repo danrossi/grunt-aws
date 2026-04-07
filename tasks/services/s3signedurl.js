@@ -18,7 +18,8 @@ module.exports = function(grunt) {
         var s3 = new S3({
             credentials: {
                 accessKeyId: opts.accessKeyId,
-                secretAccessKey: opts.secretAccessKey
+                secretAccessKey: opts.secretAccessKey,
+                sessionToken: opts.sessionToken
             },
             region: opts.region
         });
