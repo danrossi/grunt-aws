@@ -8,7 +8,9 @@ const path = require("path"),
 
 const { S3 } = require('@aws-sdk/client-s3'),
 { NodeHttpHandler } = require("@aws-sdk/node-http-handler"),
-https = require("https");
+https = require("https"),
+standardTypes = require('mime/types/standard.js').default,
+otherTypes = require('mime/types/other.js').default;
 
 module.exports = function(grunt) {
 
@@ -59,8 +61,9 @@ module.exports = function(grunt) {
     var done = this.async();
 
     //dynamic import due to grunt being old and not supporting ES.
-    const mimeModule = await import('mime');
-    const mime = mimeModule.default;
+    const { Mime } = await import('mime');
+
+    const mime = new Mime(standardTypes, otherTypes);
     
     //get options
     var opts = this.options(DEFAULTS);
@@ -68,6 +71,10 @@ module.exports = function(grunt) {
     //checks
     if(!opts.bucket)
       grunt.fail.warn("No 'bucket' has been specified");
+
+    //custom mime types
+    if(typeof opts.mime === 'object')
+      mime.define(opts.mime);
 
     var requestHandler;
 
