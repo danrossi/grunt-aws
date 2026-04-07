@@ -37,15 +37,9 @@ module.exports = function(grunt) {
 
     //dry run prefix
     var DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
-
-    //whitelist allowed keys
-    /*AWS.config.update(_.pick(opts,
-      'accessKeyId',
-      'secretAccessKey'
-    ), true);*/
  
     //route53 client
-    var Route53 = new Route53({
+    var route53 = new Route53({
       credentials: {
         accessKeyId: opts.accessKeyId,
         secretAccessKey: opts.secretAccessKey
@@ -58,7 +52,7 @@ module.exports = function(grunt) {
     //------------------------------------------------
 
     function allRecordsInCache() {
-      return _.all(_.pairs(opts.zones), function(config){
+      return _.every(_.toPairs(opts.zones), function(config){
         var zone = config[0];
         var records = config[1];
         var cachedZone = CacheMgr.get('route53:zone:' + zone);
@@ -70,7 +64,7 @@ module.exports = function(grunt) {
     }
 
     function createRecordsForZones(callback) {
-      async.eachLimit(_.pairs(opts.zones), opts.concurrent, function(config, next){
+      async.eachLimit(_.toPairs(opts.zones), opts.concurrent, function(config, next){
         var zone = config[0];
         var records = config[1];
         getZoneID(zone, function(err, zoneID){
@@ -87,7 +81,7 @@ module.exports = function(grunt) {
         if (cache.id) return callback(null, cache.id);
       }
       //get list of zones from route53 and load into cache if cache enabled
-      Route53.listHostedZones({}, function(err, data){
+      route53.listHostedZones({}, function(err, data){
         if(err) return callback(err);
         var zoneDataForCurrentZone;
         _.each(data.HostedZones, function(zoneData){
@@ -110,7 +104,7 @@ module.exports = function(grunt) {
 
     function createRecords(zone, zoneID, records, callback) {
       //get list of all records for this zone
-      Route53.listResourceRecordSets({ HostedZoneId: zoneID }, function(err, data) {
+      route53.listResourceRecordSets({ HostedZoneId: zoneID }, function(err, data) {
         if(err) return callback(err);
 
         if (opts.cache){
@@ -125,10 +119,10 @@ module.exports = function(grunt) {
         }
 
         //find all records that don't exist in Route53
-        var recordsToCreate = _.select(records, function(record) {
+        var recordsToCreate = _.filter(records, function(record) {
           //check for any Route53 record matching this record's name (with period on the end)
           var checkForName = (record.name || record.Name) + '.';
-          return !_.detect(data.ResourceRecordSets, function(route53RecordData) {
+          return !_.find(data.ResourceRecordSets, function(route53RecordData) {
             return route53RecordData.Name === checkForName;
           });
         });
@@ -154,7 +148,7 @@ module.exports = function(grunt) {
 
         //submit the batch change request
         if (opts.dryRun) return callback();
-        Route53.changeResourceRecordSets(batchChangeRequest, callback);
+        route53.changeResourceRecordSets(batchChangeRequest, callback);
       });
     }
 

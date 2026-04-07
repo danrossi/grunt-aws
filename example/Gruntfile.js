@@ -1,13 +1,9 @@
-
-var path = require("path");
-
+const path = require('path');
 
 module.exports = function(grunt) {
 
-  //grunt.loadNpmTasks("grunt-aws");
-
-  grunt.loadTasks(path.join("../","tasks", "services"));
-
+  grunt.loadNpmTasks("grunt-aws");
+  
   grunt.initConfig({
 
     aws: grunt.file.readJSON("aws-credentials.json"),
@@ -69,10 +65,25 @@ module.exports = function(grunt) {
       options: {
         accessKeyId: "<%= aws.accessKeyId %>",
         secretAccessKey: "<%= aws.secretAccessKey %>",
-        region: "...",
-        target: "...",
-        message: "...",
-        subject: "..."
+        region: "<%= aws.region %>",
+        target: "<%= aws.sns_target %>",
+        message: 'You got it',
+        subject: 'A Notification'
+      }
+    },
+    route53: {
+      options: {
+        accessKeyId: "<%= aws.accessKeyId %>",
+        secretAccessKey: "<%= aws.secretAccessKey %>",
+        zones: {
+		      "<%= aws.zone %>": [
+            {
+              name: "<%= aws.zone_name %>",
+              type: 'CNAME',
+              value: ["<%= aws.zone_value %>"]
+            }
+          ]
+        }
       }
     }
 

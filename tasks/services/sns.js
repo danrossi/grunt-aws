@@ -29,13 +29,6 @@ module.exports = function(grunt) {
     //mark as async
     var done = this.async();
 
-    //whitelist allowed keys
-    /*AWS.config.update(_.pick(opts,
-      'accessKeyId',
-      'secretAccessKey',
-      'region'
-    ), true);*/
-
     //sns client
     var sns = new SNS({
       credentials: {

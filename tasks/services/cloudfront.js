@@ -21,15 +21,6 @@ module.exports = function(grunt) {
     //mark as async
     var done = this.async();
 
-    //whitelist allowed keys
-    //AWS.config.update(_.pick(opts, "accessKeyId", "secretAccessKey"), true);
-
-    //whitelist allowed keys
-    /*AWS.config.update(
-      _.pick(opts, "accessKeyId", "secretAccessKey", "sessionToken"),
-      true
-    );*/
-
     //cloudfront client
     var cloudfront = new CloudFront({
       credentials: {

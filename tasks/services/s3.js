@@ -5,25 +5,21 @@ const path = require("path"),
     crypto = require("crypto"),
     zlib = require("zlib"),
     CacheMgr = require("../cache-mgr");
-    //mime = require("mime").default;
-
 
 const { S3 } = require('@aws-sdk/client-s3');
 
-module.exports = async function(grunt) {
-
-  
+module.exports = function(grunt) {
 
   //s3 description
-  let DESC = "grunt-aws's s3 task for easy deploys";
+  var DESC = "grunt-aws's s3 task for easy deploys";
 
   //s3 defaults
-  let DEFAULTS = {
+  var DEFAULTS = {
     access: 'public-read',
     concurrent: 20,
     cacheTTL: 60*60*1000,
-    // deleteFirst: true,
-    // deleteMatched: true,
+    // devareFirst: true,
+    // devareMatched: true,
     dryRun: false,
     gzip: true,
     cache: true,
@@ -34,20 +30,18 @@ module.exports = async function(grunt) {
     assumeRole: false
   };
 
-  
-
   //Action taking place.
-  let action = "Put";
+  var action = "Put";
 
   //s3 task
   grunt.registerMultiTask("s3", DESC, async function() {
    
     //normalize files array (force expand)
-    let files = [];
+    var files = [];
     this.files.forEach(function(file) {
-      let cwd = file.cwd || '';
+      var cwd = file.cwd || '';
       files = files.concat(file.src.map(function(src) {
-        let s = path.join(cwd, src),
+        var s = path.join(cwd, src),
             d = (cwd||file.src.length>1) ? ((file.dest||'')+src) : file.dest || src;
         return {src: s, dest: d};
       }));
@@ -59,43 +53,21 @@ module.exports = async function(grunt) {
     });
 
     //mark as async
-    let done = this.async();
+    var done = this.async();
 
     //dynamic import due to grunt being old and not supporting ES.
     const mimeModule = await import('mime');
     const mime = mimeModule.default;
     
     //get options
-    let opts = this.options(DEFAULTS);
+    var opts = this.options(DEFAULTS);
 
     //checks
     if(!opts.bucket)
       grunt.fail.warn("No 'bucket' has been specified");
 
-    //custom mime types
-    //if(typeof opts.mime === 'object')
-    //  mime.define(opts.mime);
-    //if(typeof opts.mimeDefault === 'string')
-    //  mime.default_type = opts.mimeDefault;
-
-    //whitelist allowed keys
-    /*AWS.config.update(_.pick(opts,
-      'sessionToken',
-      'region',
-      'sslEnabled',
-      'maxRetries',
-      'httpOptions'
-    ), true);
-
-    if (opts.assumeRole !== true) {
-      AWS.config.update(_.pick(opts,
-        'accessKeyId',
-        'secretAccessKey'
-      ));
-    }*/
-
     //s3 client
-    let s3 = new S3({
+    var s3 = new S3({
       credentials: {
         accessKeyId: opts.accessKeyId,
         secretAccessKey: opts.secretAccessKey
@@ -104,10 +76,10 @@ module.exports = async function(grunt) {
     });
 
     //dry run prefix
-    let DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
+    var DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
 
     //retrieve cache for this bucket
-    let cache = CacheMgr.get(opts.bucket);
+    var cache = CacheMgr.get(opts.bucket);
 
     if(!cache.options)
       cache.options = {};
@@ -117,7 +89,7 @@ module.exports = async function(grunt) {
       cache.files = {};
 
     //base object (lacks Body and Key)
-    let baseObject = {
+    var baseObject = {
       ACL: opts.access,
       Bucket: opts.bucket
     };
@@ -150,7 +122,7 @@ module.exports = async function(grunt) {
     if(typeof baseObject.CacheControl === 'number')
       baseObject.CacheControl = "max-age="+baseObject.CacheControl+", public";
     else if (typeof baseObject.CacheControl === 'object') {
-      let val = baseObject.CacheControl,
+      var val = baseObject.CacheControl,
           maxage = val.MaxAge || null,
           swr = val.StaleWhileRevalidate || null;
       if (!maxage) {
@@ -171,16 +143,16 @@ module.exports = async function(grunt) {
       baseObject.Metadata = opts.meta;
 
     //calculate options hash
-    let optionsHash = hash(JSON.stringify(baseObject), 'sha256');
-    let currOptionsHash = cache.options[this.target];
+    var optionsHash = hash(JSON.stringify(baseObject), 'sha256');
+    var currOptionsHash = cache.options[this.target];
 
     //maintain stats
-    let stats = { puts: 0, dels: 0, refreshed: false, newOptions: optionsHash !== currOptionsHash };
+    var stats = { puts: 0, dels: 0, refreshed: false, newOptions: optionsHash !== currOptionsHash };
 
     if(stats.newOptions)
       cache.options[this.target] = optionsHash;
 
-    let subtasks = [];
+    var subtasks = [];
 
     //create the bucket if it does not exist
     if(opts.createBucket)
@@ -197,12 +169,12 @@ module.exports = async function(grunt) {
       subtasks.push(copyAllFiles);
 
     //start!
-    async.series(subtasks, taskComplete);
+    async.series(subtasks, taskCompvare);
 
     //------------------------------------------------
 
     function createBucket(callback) {
-      let params = {
+      var params = {
         Bucket: opts.bucket,
         ACL: opts.access
       };
@@ -214,7 +186,7 @@ module.exports = async function(grunt) {
           err.message = 'createBucket:s3.listBuckets: ' + err.message;
           return callback(err);
         }
-        let existingBucket = _.detect(data.Buckets, function(bucket){
+        var existingBucket = _.find(data.Buckets, function(bucket){
           return opts.bucket === bucket.Name;
         });
         if(existingBucket){
@@ -239,15 +211,15 @@ module.exports = async function(grunt) {
     }
 
     function enableWebHosting(callback) {
-      let defaultWebOptions = {
+      var defaultWebOptions = {
         "grunt-overwrite": false,
         IndexDocument: { Suffix : 'index.html' }
       };
-      let webOptions = _.isObject(opts.enableWeb) ? opts.enableWeb : defaultWebOptions;
+      var webOptions = _.isObject(opts.enableWeb) ? opts.enableWeb : defaultWebOptions;
 
       s3.getBucketWebsite({ Bucket:opts.bucket }, function(err){
         if ((err && err.name === 'NoSuchWebsiteConfiguration') || webOptions["grunt-overwrite"]){
-          delete webOptions["grunt-overwrite"];
+          devare webOptions["grunt-overwrite"];
           //opts.enableWeb can be the params for WebsiteRedirectLocation.
           //Otherwise, just set the index.html as default suffix
           grunt.log.writeln('Enabling website configuration on ' + opts.bucket + '...');
@@ -267,13 +239,13 @@ module.exports = async function(grunt) {
 
     function getFileList(callback) {
       //calculate prefix
-      let prefix = null, pindex = Infinity;
+      var prefix = null, pindex = Infinity;
       files.forEach(function(file) {
         if(prefix === null) {
           prefix = file.dest;
           return;
         }
-        let i = 0;
+        var i = 0;
         while(i < prefix.length &&
               i < file.dest.length &&
               file.dest.charAt(i) === prefix.charAt(i)) i++;
@@ -282,8 +254,8 @@ module.exports = async function(grunt) {
       prefix = prefix.substr(0, pindex);
 
       //get prefix's earliest refresh time
-      let refreshedAt = 0;
-      for(let p in cache.prefixes)
+      var refreshedAt = 0;
+      for(var p in cache.prefixes)
         if(prefix.indexOf(p) === 0)
           refreshedAt = Math.max(refreshedAt, cache.prefixes[p]);
 
@@ -300,7 +272,7 @@ module.exports = async function(grunt) {
       fetchObjects('');
 
       function fetchObjects(marker) {
-        let msg = "Retrieving list of existing objects";
+        var msg = "Retrieving list of existing objects";
         msg += prefix ? " prefixed with '" + prefix + "'" : "";
         msg += marker ? (" after '" + marker + "'") : "";
         msg += "...";
@@ -344,7 +316,7 @@ module.exports = async function(grunt) {
 
     function getFile(file, callback) {
       //extract src and dest
-      let src = file.src,
+      var src = file.src,
           contents = fs.readFileSync(src),
           dest = file.dest;
 
@@ -360,7 +332,7 @@ module.exports = async function(grunt) {
     function copyFile(src, contents, dest, callback) {
 
       //skip existing files
-      let etag = cache.files[dest];
+      var etag = cache.files[dest];
       if(opts.cache &&
          !stats.newOptions &&
          etag && etag === hash(contents, 'md5')) {
@@ -377,10 +349,10 @@ module.exports = async function(grunt) {
 
       //fake successful upload
       if(opts.dryRun)
-        return putComplete();
+        return putCompvare();
 
       //extend the base object
-      let object = Object.assign({},baseObject);
+      var object = Object.assign({},baseObject);
       object.Key = dest;
 
 
@@ -392,7 +364,7 @@ module.exports = async function(grunt) {
 
       if (opts.copyFrom || opts.copyFile) {
         if (opts.copyFrom) {
-          let copySource = src.split('/');
+          var copySource = src.split('/');
           copySource[0] =  opts.copyFrom;
           copySource = copySource.join('/');
         } else {
@@ -401,14 +373,14 @@ module.exports = async function(grunt) {
         object.MetadataDirective  = "REPLACE";
         object.CopySource = copySource;
         action = "Copy";
-        s3.copyObject(object, putComplete)
+        s3.copyObject(object, putCompvare)
       } else {
         //upload!
         object.Body = contents;
-        s3.putObject(object, putComplete);
+        s3.putObject(object, putCompvare);
       }
 
-      function putComplete(err, results) {
+      function putCompvare(err, results) {
         if(err) {
           return callback("Put '" + dest + "' failed...\n" + err + "\n ");
         }
@@ -428,7 +400,7 @@ module.exports = async function(grunt) {
 
     }
 
-    function taskComplete(err) {
+    function taskCompvare(err) {
       if(err) {
         grunt.fail.warn(err);
         return done(false);
@@ -445,7 +417,7 @@ module.exports = async function(grunt) {
 
 //helper functions
 function hash(buff, algo) {
-  let h = crypto.createHash(algo);
+  var h = crypto.createHash(algo);
   h.update(buff);
   return h.digest('hex');
 }
