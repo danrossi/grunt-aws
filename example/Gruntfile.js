@@ -75,15 +75,7 @@ module.exports = function(grunt) {
       options: {
         accessKeyId: "<%= aws.accessKeyId %>",
         secretAccessKey: "<%= aws.secretAccessKey %>",
-        zones: {
-		      "<%= aws.zone %>": [
-            {
-              name: "<%= aws.zone_name %>",
-              type: 'CNAME',
-              value: ["<%= aws.zone_value %>"]
-            }
-          ]
-        }
+        zones: "<%= aws.route53_zones %>"
       }
     }
 
