@@ -26,6 +26,12 @@
       "minimatch": "~10.2.5",
       "glob": "~13.0.6",
       "nopt": "~9.0.0"
+    },
+    "grunt-legacy-log": {
+      "lodash": "~4.18.1"
+    },
+    "grunt-legacy-util": {
+      "lodash": "~4.18.1"
     }
   },
   "peerDependencies": {
@@ -44,13 +50,13 @@
     "compress"
   ],
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "~3.1021.0",
-    "@aws-sdk/client-route-53": "~3.1021.0",
-    "@aws-sdk/client-s3": "~3.1021.0",
-    "@aws-sdk/client-sns": "~3.1021.0",
-    "@aws-sdk/s3-request-presigner": "~3.1021.0",
+    "@aws-sdk/client-cloudfront": "~3.1025.0",
+    "@aws-sdk/client-route-53": "~3.1025.0",
+    "@aws-sdk/client-s3": "~3.1025.0",
+    "@aws-sdk/client-sns": "~3.1025.0",
+    "@aws-sdk/s3-request-presigner": "~3.1025.0",
     "async": "~3.2.6",
-    "lodash": "~4.17.23",
+    "lodash": "~4.18.1",
     "mime": "~4.1.0"
   }
 }
