@@ -4,7 +4,8 @@ const path = require("path"),
     fs = require("fs"),
     crypto = require("crypto"),
     zlib = require("zlib"),
-    CacheMgr = require("../cache-mgr");
+    CacheMgr = require("../cache-mgr"),
+    { createAssumedRole } = require("./createAssumedRole");
 
 const { S3 } = require('@aws-sdk/client-s3'),
 { NodeHttpHandler } = require("@aws-sdk/node-http-handler"),
@@ -84,6 +85,14 @@ module.exports = function(grunt) {
         requestTimeout: 5000,
         httpsAgent: new https.Agent(opts.httpOptions)
       });
+    }
+
+    //create a temporary token from an assumed role
+    if (opts.assumeRole) {
+      const credentials = await createAssumedRole(opts.region, opts.assumeRole, opts.roleSessionName);
+      opts.accessKeyId - credentials.AccessKeyId;
+      opts.secretAccessKey = credentials.SecretAccessKey;
+      opts.sessionToken = credentials.SessionToken;
     }
 
     //s3 client

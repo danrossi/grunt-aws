@@ -1,6 +1,7 @@
 var _ = require("lodash"),
     async = require("async"),
-    CacheMgr = require("../cache-mgr");
+    CacheMgr = require("../cache-mgr"),
+    { createAssumedRole } = require("./createAssumedRole");
 
 const { Route53 } = require('@aws-sdk/client-route-53');
 
@@ -19,7 +20,7 @@ module.exports = function(grunt) {
   };
 
   //route53 task
-  grunt.registerTask("route53", DESC, function() {
+  grunt.registerTask("route53", DESC, async function() {
 
     //get options
     var opts = this.options(DEFAULTS);
@@ -37,6 +38,14 @@ module.exports = function(grunt) {
 
     //dry run prefix
     var DRYRUN = opts.dryRun ? "[DRYRUN] " : "";
+
+    //create a temporary token from an assumed role
+    if (opts.assumeRole) {
+      const credentials = await createAssumedRole(opts.region, opts.assumeRole, opts.roleSessionName);
+      opts.accessKeyId - credentials.AccessKeyId;
+      opts.secretAccessKey = credentials.SecretAccessKey;
+      opts.sessionToken = credentials.SessionToken;
+    }
  
     //route53 client
     var route53 = new Route53({

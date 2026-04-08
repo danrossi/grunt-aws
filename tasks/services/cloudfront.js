@@ -1,5 +1,6 @@
 var _ = require("lodash"),
-  async = require("async");
+  async = require("async"),
+  { createAssumedRole } = require("./createAssumedRole");
 
 const { CloudFront } = require("@aws-sdk/client-cloudfront");
 
@@ -11,7 +12,7 @@ module.exports = function(grunt) {
   var DEFAULTS = {};
 
   //cloudfront task
-  grunt.registerMultiTask("cloudfront", DESC, function() {
+  grunt.registerMultiTask("cloudfront", DESC, async function() {
     //get options
     var opts = this.options(DEFAULTS);
 
@@ -20,6 +21,10 @@ module.exports = function(grunt) {
 
     //mark as async
     var done = this.async();
+
+    if (opts.assumeRole) {
+      opts.sessionToken = await createAssumedRole(opts.region, opts.assumeRole, opts.roleSessionName);
+    }
 
     //cloudfront client
     var cloudfront = new CloudFront({

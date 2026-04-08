@@ -21,12 +21,8 @@
   },
   "licenses": "MIT",
   "main": "tasks/aws.js",
-  "overrides": {
-    "minimatch": "~10.2.5",
-    "nopt": "~9.0.0"
-  },
   "peerDependencies": {
-    "grunt": "github:danrossi/grunt.git#minimatch-fix"
+    "grunt": "1.6.x"
   },
   "keywords": [
     "gruntplugin",
@@ -45,6 +41,7 @@
     "@aws-sdk/client-route-53": "~3.1025.0",
     "@aws-sdk/client-s3": "~3.1025.0",
     "@aws-sdk/client-sns": "~3.1025.0",
+    "@aws-sdk/client-sts": "^3.1026.0",
     "@aws-sdk/node-http-handler": "^3.370.0",
     "@aws-sdk/s3-request-presigner": "~3.1025.0",
     "async": "~3.2.6",

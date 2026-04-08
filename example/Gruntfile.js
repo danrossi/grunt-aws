@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = function(grunt) {
 
-  grunt.loadNpmTasks("grunt-aws");
+  grunt.loadNpmTasks("grunt-aws");  
   
   grunt.initConfig({
 
@@ -28,6 +28,15 @@ module.exports = function(grunt) {
       build2: {
         options: {
           "cache": false,
+        },
+        cwd: "build2",
+        src: "**"
+      },
+      build3: {
+        options: {
+          "cache": false,
+          "assumeRole": "<%= aws.role_arn %>",
+          "roleSessionName": "TemporarySession"
         },
         cwd: "build2",
         src: "**"

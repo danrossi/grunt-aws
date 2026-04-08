@@ -1,5 +1,6 @@
 var _ = require("lodash"),
-    async = require("async");
+    async = require("async"),
+    { createAssumedRole } = require("./createAssumedRole");
 
 const { SNS } = require("@aws-sdk/client-sns");
 
@@ -12,7 +13,7 @@ module.exports = function(grunt) {
   var DEFAULTS = {};
 
   //sns task
-  grunt.registerTask("sns", DESC, function() {
+  grunt.registerTask("sns", DESC, async function() {
 
     //get options
     var opts = this.options(DEFAULTS);
@@ -28,6 +29,14 @@ module.exports = function(grunt) {
 
     //mark as async
     var done = this.async();
+
+    //create a temporary token from an assumed role
+    if (opts.assumeRole) {
+      const credentials = await createAssumedRole(opts.region, opts.assumeRole, opts.roleSessionName);
+      opts.accessKeyId - credentials.AccessKeyId;
+      opts.secretAccessKey = credentials.SecretAccessKey;
+      opts.sessionToken = credentials.SessionToken;
+    }
 
     //sns client
     var sns = new SNS({

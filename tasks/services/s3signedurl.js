@@ -1,5 +1,7 @@
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { GetObjectCommand, S3 } = require('@aws-sdk/client-s3');
+const { createAssumedRole } = require("./createAssumedRole");
+
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner'),
+{ GetObjectCommand, S3 } = require('@aws-sdk/client-s3');
 
 module.exports = function(grunt) {
 
@@ -14,6 +16,14 @@ module.exports = function(grunt) {
         };
 
         var opts = this.options(DEFAULTS);
+
+        //create a temporary token from an assumed role
+        if (opts.assumeRole) {
+        const credentials = await createAssumedRole(opts.region, opts.assumeRole, opts.roleSessionName);
+        opts.accessKeyId - credentials.AccessKeyId;
+        opts.secretAccessKey = credentials.SecretAccessKey;
+        opts.sessionToken = credentials.SessionToken;
+        }
 
         var s3 = new S3({
             credentials: {
