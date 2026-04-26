@@ -9,7 +9,9 @@ module.exports = function(grunt) {
   var DESC = "grunt-aws's cloudfront";
 
   //cloudfront defaults (none at the moment)
-  var DEFAULTS = {};
+  var DEFAULTS = {
+    region: ""
+  };
 
   //cloudfront task
   grunt.registerMultiTask("cloudfront", DESC, async function() {
@@ -32,7 +34,9 @@ module.exports = function(grunt) {
         accessKeyId: opts.accessKeyId,
         secretAccessKey: opts.secretAccessKey,
         sessionToken: opts.sessionToken
-      }
+      },
+      //requires a region set due to a bug
+      region: opts.region
     });
 
     var subtasks = [];

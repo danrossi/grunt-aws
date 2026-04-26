@@ -60,9 +60,11 @@ module.exports = function(grunt) {
 
     cloudfront: {
       options: {
-        accessKeyId: "<%= aws.accessKeyId %>",
-        secretAccessKey: "<%= aws.secretAccessKey %>",
+        accessKeyId: "<%= aws.cfaccessKeyId %>",
+        secretAccessKey: "<%= aws.cfsecretAccessKey %>",
         distributionId: "<%= aws.cloudfront_dist_id %>",
+        //requires a dummy region due to a bug
+        region: "<%= aws.region %>",
         invalidations: [
           "/*"
         ]
